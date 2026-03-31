@@ -1,7 +1,7 @@
 include .env
 export
 
-.PHONY: cert cert-renew up down restart logs logs-navidrome logs-nginx status
+.PHONY: cert cert-renew up down restart logs logs-navidrome logs-nginx status playlists
 
 cert:
 	docker compose down nginx
@@ -20,16 +20,16 @@ cert-renew:
 
 up:
 	mkdir -p $(ND_MUSICFOLDER) $(ND_DATAFOLDER)
-	docker compose up -d navidrome nginx
+	docker compose up -d
 
 down:
 	docker compose down
 
 restart:
-	docker compose restart navidrome nginx
+	docker compose restart
 
 logs:
-	docker compose logs -f navidrome nginx
+	docker compose logs -f
 
 logs-navidrome:
 	docker compose logs -f navidrome
@@ -39,3 +39,6 @@ logs-nginx:
 
 status:
 	docker compose ps
+
+playlists:
+	./gen-playlists.sh
