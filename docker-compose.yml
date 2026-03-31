@@ -1,0 +1,61 @@
+services:
+  navidrome:
+    image: deluan/navidrome:latest
+    restart: unless-stopped
+    environment:
+      ND_LOGLEVEL: ${ND_LOGLEVEL}
+      ND_SESSIONTIMEOUT: ${ND_SESSIONTIMEOUT}
+      ND_SCANSCHEDULE: ${ND_SCANSCHEDULE}
+      ND_TRANSCODINGCACHESIZE: ${ND_TRANSCODINGCACHESIZE}
+      ND_ENABLETRANSCODINGCONFIG: ${ND_ENABLETRANSCODINGCONFIG}
+    volumes:
+      - ${ND_DATAFOLDER}:/data
+      - ${ND_MUSICFOLDER}:/music:ro
+    networks:
+      - internal
+    expose:
+      - "4533"
+
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    restart: unless-stopped
+    volumes:
+      - ${ND_MUSICFOLDER}:/srv
+      - filebrowser-data:/database
+      - ./filebrowser/settings.json:/config/settings.json
+    networks:
+      - internal
+    expose:
+      - "80"
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - certbot-certs:/etc/nginx/certs:ro
+    depends_on:
+      - navidrome
+      - filebrowser
+    networks:
+      - internal
+      - external
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - certbot-certs:/etc/letsencrypt
+
+volumes:
+  certbot-certs:
+  filebrowser-data:
+
+networks:
+  internal:
+    internal: true
+  external:

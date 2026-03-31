@@ -1,0 +1,8 @@
+{
+  "port": 80,
+  "baseURL": "/upload",
+  "address": "",
+  "log": "stdout",
+  "database": "/database/filebrowser.db",
+  "root": "/srv"
+}
